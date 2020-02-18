@@ -26,4 +26,3 @@ def move(my_history, their_history, my_score, their_score):
     else:
         return 'b'
     
-    hello can you see this
