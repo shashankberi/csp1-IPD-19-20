@@ -8,10 +8,10 @@
 
 team_name = 'E0'
 strategy_name = '75-25'
-strategy_description = '75% collude, 25% betray'
+strategy_description = '75% betray, 25% collude'
     
 def move(my_history, their_history, my_score, their_score):
-  '''This function makes it a 75% collude, 25% betray situation/strategy'''
+  '''This function makes it a 75% betray, 25% collude situation/strategy =, ir betrays to lower opponents score.'''
   opponent_b = 0 
   for decision in their_history:
     if decision == 'b':

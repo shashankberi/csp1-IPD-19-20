@@ -1,34 +1,33 @@
 --------------------------------------------------------------------------------
 Section 0 - Line up
 --------------------------------------------------------------------------------
-Player 0 (P0): E0, 75-25
+Player 0 (P0): E0, 70-30
         75% collude, 25% betray
-Player 1 (P1): E1, 65-35
-        65% collude, 35% betray
+Player 1 (P1): E6, Collude until betrayed
+        Collude first round. Collude, unless betrayed; then always betray.
 Player 2 (P2): E2, Alternate
         Collude, then alternate.
-Player 3 (P3): E3, Collude but retaliate
-        Collude first round. Collude, except in a round after getting 
-        a severe punishment.
+Player 3 (P3): missing assignment, missing assignment
+        missing assignment
 --------------------------------------------------------------------------------
 Section 1 - Player vs. Player
 --------------------------------------------------------------------------------
 Each column shows pts//round earned against each other player:
              P0     P1     P2     P3
-vs. P0 :      0      0   -370      0
-vs. P1 :      0      0   -367      0
-vs. P2 :    -78    -79      0   -201
-vs. P3 :      0      0   -198      0
-TOTAL  :    -78    -79   -935   -201
+vs. P0 :      0      0   -369    -32
+vs. P1 :      0      0   -372   -101
+vs. P2 :    -78    -76      0    -77
+vs. P3 :    -37   -104   -370      0
+TOTAL  :   -115   -180  -1111   -210
 --------------------------------------------------------------------------------
 Section 2 - Leaderboard
 --------------------------------------------------------------------------------
 Average points per round:
 Team name (P#):  Score      with strategy name
-E0        (P0):        -20 points with 75-25                                   
-E1        (P1):        -20 points with 65-35                                   
-E3        (P3):        -51 points with Collude but retaliate                   
-E2        (P2):       -234 points with Alternate                               
+E0        (P0):        -29 points with 70-30                                   
+E6        (P1):        -45 points with Collude until betrayed                  
+missing as(P3):        -53 points with missing assignment                      
+E2        (P2):       -278 points with Alternate                               
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 example0--------------------------------------------------------------------------------
@@ -41,7 +40,7 @@ example0------------------------------------------------------------------------
 ####
 
 team_name = 'E0'
-strategy_name = '75-25'
+strategy_name = '70-30'
 strategy_description = '75% collude, 25% betray'
     
 def move(my_history, their_history, my_score, their_score):
@@ -68,24 +67,26 @@ example1------------------------------------------------------------------------
 #     move: A function that returns 'c' or 'b'
 ####
 
-team_name = 'E1'
-strategy_name = '65-35'
-strategy_description = '65% collude, 35% betray'
+
+team_name = 'E6'
+strategy_name = 'Collude until betrayed'
+strategy_description = '''\
+Collude first round. Collude, unless betrayed; then always betray.'''
     
 def move(my_history, their_history, my_score, their_score):
-  '''This function makes it a 65% collude, 35% betray situation/strategy'''
-  opponent_b = 0 
-  for decision in their_history:
-    if decision == 'b':
-      opponent_b+=1
-  if len(their_history)==0:
-    return "c"
-  else:
-    if opponent_b/len(their_history)>0.35 or their_score > my_score:
-      return 'b'
+    '''Make my move based on the history with this player.
+    
+    history: a string with one letter (c or b) per round that has been played with this opponent.
+    their_history: a string of the same length as history, possibly empty. 
+    The first round between these two players is my_history[0] and their_history[0]
+    The most recent round is my_history[-1] and their_history[-1]
+    
+    Returns 'c' or 'b' for collude or betray.
+    '''
+    if 'b' in their_history:
+        return 'b'
     else:
-      return 'c'
-  print(opponent_b)
+        return 'c'
 --------------------------------------------------------------------------------
 example2--------------------------------------------------------------------------------
 ####
@@ -125,11 +126,7 @@ example3------------------------------------------------------------------------
 #     move: A function that returns 'c' or 'b'
 ####
 
-team_name = 'E3'
-strategy_name = 'Collude but retaliate'
-strategy_description = '''\
-Collude first round. Collude, except in a round after getting 
-a severe punishment.'''
+import random
     
 def move(my_history, their_history, my_score, their_score):
     '''Make my move based on the history with this player.
@@ -141,140 +138,145 @@ def move(my_history, their_history, my_score, their_score):
     
     Returns 'c' or 'b' for collude or betray.
     '''
-    if len(my_history)==0: # It's the first round; collude.
-        return 'c'
-    elif my_history[-1]=='c' and their_history[-1]=='b':
-        return 'b' # Betray if they were severely punished last time,
+    # If the other player has betrayed or this is the last half of the game, 
+    if 'b' in their_history or len(their_history)>100: 
+        return 'b'               # Betray.
     else:
-        return 'c' # otherwise collude.--------------------------------------------------------------------------------
+        return 'c'         # but 90% of the time collude--------------------------------------------------------------------------------
 Section 3 - Game Data for Team E0
 --------------------------------------------------------------------------------
-0 pt//round: E0(P0) "75-25"
-0 pt//ound: E1(P1) "65-35"
+0 pt//round: E0(P0) "70-30"
+0 pt//ound: E6(P1) "Collude until betrayed"
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+
+CCCCCCCCCCCCC
+CCCCCCCCCCCCC
 
 --------------------------------------------------------------------------------
--78 pt//round: E0(P0) "75-25"
--370 pt//ound: E2(P2) "Alternate"
+-78 pt//round: E0(P0) "70-30"
+-369 pt//ound: E2(P2) "Alternate"
+CcBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBb
+CBcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
+
+BbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBb
+cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
+
+--------------------------------------------------------------------------------
+-37 pt//round: E0(P0) "70-30"
+-32 pt//ound: missing assignment(P3) "missing assignment"
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+
+CCCCCCCCCCCCCCCCCCCCCcbbbbbbbbbbbbbbb
+CCCCCCCCCCCCCCCCCCCCCBbbbbbbbbbbbbbbb
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Section 3 - Game Data for Team E6
+--------------------------------------------------------------------------------
+0 pt//round: E6(P1) "Collude until betrayed"
+0 pt//ound: E0(P0) "70-30"
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+
+CCCCCCCCCCCCC
+CCCCCCCCCCCCC
+
+--------------------------------------------------------------------------------
+-76 pt//round: E6(P1) "Collude until betrayed"
+-372 pt//ound: E2(P2) "Alternate"
 CcBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBb
 CBcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
 
 BbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBb
 cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
 
---------------------------------------------------------------------------------
-0 pt//round: E0(P0) "75-25"
-0 pt//ound: E3(P3) "Collude but retaliate"
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-
-CCCCCC
-CCCCCC
+BbBbBbBbBbBbBbBbBbBbBbBbB
+cbcbcbcbcbcbcbcbcbcbcbcbc
 
 --------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-Section 3 - Game Data for Team E1
---------------------------------------------------------------------------------
-0 pt//round: E1(P1) "65-35"
-0 pt//ound: E0(P0) "75-25"
+-104 pt//round: E6(P1) "Collude until betrayed"
+-101 pt//ound: missing assignment(P3) "missing assignment"
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCcbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+CCCCCCCCCCCCCCCCCCCCCBbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 
---------------------------------------------------------------------------------
--79 pt//round: E1(P1) "65-35"
--367 pt//ound: E2(P2) "Alternate"
-CcBcBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBb
-CBcBcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
-
-BbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbB
-cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
-
---------------------------------------------------------------------------------
-0 pt//round: E1(P1) "65-35"
-0 pt//ound: E3(P3) "Collude but retaliate"
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+bbbbbbbbbbb
+bbbbbbbbbbb
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 Section 3 - Game Data for Team E2
 --------------------------------------------------------------------------------
--370 pt//round: E2(P2) "Alternate"
--78 pt//ound: E0(P0) "75-25"
+-369 pt//round: E2(P2) "Alternate"
+-78 pt//ound: E0(P0) "70-30"
+CBcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
+CcBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBb
+
+cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
+BbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBb
+
+--------------------------------------------------------------------------------
+-372 pt//round: E2(P2) "Alternate"
+-76 pt//ound: E6(P1) "Collude until betrayed"
 CBcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
 CcBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBb
 
 cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
 BbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBb
 
---------------------------------------------------------------------------------
--367 pt//round: E2(P2) "Alternate"
--79 pt//ound: E1(P1) "65-35"
-CBcBcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
-CcBcBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBb
-
-cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
-BbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbB
+cbcbcbcbcbcbcbcbcbcbcbcbc
+BbBbBbBbBbBbBbBbBbBbBbBbB
 
 --------------------------------------------------------------------------------
--198 pt//round: E2(P2) "Alternate"
--201 pt//ound: E3(P3) "Collude but retaliate"
-CBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcB
-CcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBc
+-370 pt//round: E2(P2) "Alternate"
+-77 pt//ound: missing assignment(P3) "missing assignment"
+CBcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
+CcBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBb
 
-cBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcB
-BcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBc
-
-cBcBcBcBcB
-BcBcBcBcBc
+cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
+BbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbB
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-Section 3 - Game Data for Team E3
+Section 3 - Game Data for Team missing assignment
 --------------------------------------------------------------------------------
-0 pt//round: E3(P3) "Collude but retaliate"
-0 pt//ound: E0(P0) "75-25"
+-32 pt//round: missing assignment(P3) "missing assignment"
+-37 pt//ound: E0(P0) "70-30"
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-
-CCCCCC
-CCCCCC
+CCCCCCCCCCCCCCCCCCCCCBbbbbbbbbbbbbbbb
+CCCCCCCCCCCCCCCCCCCCCcbbbbbbbbbbbbbbb
 
 --------------------------------------------------------------------------------
-0 pt//round: E3(P3) "Collude but retaliate"
-0 pt//ound: E1(P1) "65-35"
+-101 pt//round: missing assignment(P3) "missing assignment"
+-104 pt//ound: E6(P1) "Collude until betrayed"
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCBbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+CCCCCCCCCCCCCCCCCCCCCcbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+
+bbbbbbbbbbb
+bbbbbbbbbbb
 
 --------------------------------------------------------------------------------
--201 pt//round: E3(P3) "Collude but retaliate"
--198 pt//ound: E2(P2) "Alternate"
-CcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBc
-CBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcB
+-77 pt//round: missing assignment(P3) "missing assignment"
+-370 pt//ound: E2(P2) "Alternate"
+CcBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBb
+CBcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
 
-BcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBc
-cBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcB
-
-BcBcBcBcBc
-cBcBcBcBcB
+BbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbB
+cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
 
 --------------------------------------------------------------------------------
